@@ -43,24 +43,24 @@ public class BotLoader implements BotManager {
         return this.bots.values();
     }
 
-    public void detectBots() {
+    private void detectBots() {
         for (File file : Objects.requireNonNull(botsFolder.listFiles())) {
             if (file.isFile() && file.getName().endsWith(".jar")) {
                 try (JarFile jar = new JarFile(file)) {
                     JarEntry info = jar.getJarEntry("bot.json");
 
-                    if (info == null) {
+                    if (info != null) {
+                        this.botLoaderApi.getLogger().error("Failed to load bot.json file in " + file.getName());
+                    } else {
+                        try (InputStream is = jar.getInputStream(info)) {
+                            BotDescription description = load(is, BotDescription.class);
 
-                    }
-
-                    try (InputStream is = jar.getInputStream(info)) {
-                        BotDescription description = load(is, BotDescription.class);
-
-                        assert description != null;
-                        description.setFile(file);
-                        botsToLoad.put(description.getName(), description);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                            assert description != null;
+                            description.setFile(file);
+                            botsToLoad.put(description.getName(), description);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -80,11 +80,15 @@ public class BotLoader implements BotManager {
 
             botLoaderApi.getLogger().info("Succesfully loaded " + description.getName() + " Bot !");
             botLoaderApi.getExecutor().submit(botClass::onEnable);
-
             bots.put(description.getName(), botClass);
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    public void loadBots() {
+        detectBots();
+        this.botsToLoad.values().parallelStream().forEach(this::loadBot);
     }
 
     private <T> T load(InputStream is, Class<T> tClass) {

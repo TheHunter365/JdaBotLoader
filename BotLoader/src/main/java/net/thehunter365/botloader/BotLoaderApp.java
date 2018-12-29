@@ -1,6 +1,6 @@
 package net.thehunter365.botloader;
 
-import com.google.gson.Gson;
+import net.thehunter365.botloader.loader.BotLoader;
 import net.thehunter365.botloaderapi.BotLoaderApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +14,18 @@ public class BotLoaderApp extends BotLoaderApi {
 
     private ExecutorService executor;
 
-    private Gson gson;
+    private BotLoader botLoader;
 
     public BotLoaderApp() {
         this.logger = LoggerFactory.getLogger(BotLoaderApp.class);
 
         this.executor = Executors.newFixedThreadPool(2);
-    }
+        this.botLoader = new BotLoader(this);
 
+        logger.info("Starting Bots loading !");
+
+        this.botLoader.loadBots();
+    }
 
     public ExecutorService getExecutor() {
         return executor;
@@ -29,5 +33,9 @@ public class BotLoaderApp extends BotLoaderApi {
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public BotLoader getBotManager() {
+        return botLoader;
     }
 }
