@@ -5,3 +5,38 @@ This is a small java application to load your jda bots without compiling jda in 
 
 Usage !
 -------
+Run JdaBotLoader app, and in your dedicated server, use the Api to create you bot module and compile it without jda, and you can run it in the bot folder like Spigot plugins !
+ 
+ Bot creation
+------
+Create new project and add BotLoaderApi
+ 
+ you need a bot.json file like plugin.yml(Spigot Dev)
+ 
+bot.json
+```json
+{
+  "name": "BotName",
+  "author": "Author",
+  "token": "bot token",
+  "mainClass": "path.to.bot.MainClass"
+}
+```
+
+Bot
+
+Main class 
+
+```java
+
+public class YourBot implements Bot {
+    
+    @Override
+    public void onEnable() {
+        
+        //Jda instance ^^
+        JDA jda = getJda();
+        
+    }
+}
+```
