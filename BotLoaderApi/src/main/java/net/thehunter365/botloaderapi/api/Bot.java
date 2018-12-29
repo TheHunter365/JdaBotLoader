@@ -1,14 +1,37 @@
 package net.thehunter365.botloaderapi.api;
 
+import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
 import net.thehunter365.botloaderapi.BotLoaderApi;
+import net.thehunter365.botloaderapi.loader.BotDescription;
 
-public interface Bot {
+import javax.security.auth.login.LoginException;
 
-    void onEnable();
+public abstract class Bot {
 
-    BotLoaderApi getApi();
+    private BotLoaderApi api;
+    private JDA jda;
 
-    JDA getJda();
+    public void onEnable() {
+
+    }
+
+    public void init(BotLoaderApi api, BotDescription description) {
+        this.api = api;
+        try {
+            this.jda = new JDABuilder(AccountType.BOT)
+                    .setToken(description.getToken()).build();
+        } catch (LoginException e) {
+            e.printStackTrace();
+        }
+    }
+    public BotLoaderApi getApi() {
+        return this.api;
+    }
+
+    public JDA getJda() {
+        return jda;
+    }
 
 }

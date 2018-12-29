@@ -1,4 +1,4 @@
-package net.thehunter365.botloader.loader;
+package net.thehunter365.botloaderapi.loader;
 
 import java.io.File;
 
@@ -8,7 +8,7 @@ public class BotDescription {
     private String author;
     private String token;
     private String mainClass;
-    private File file;
+    private transient File file;
 
 
     public String getName() {

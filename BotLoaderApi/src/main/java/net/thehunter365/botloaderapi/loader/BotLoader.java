@@ -1,10 +1,11 @@
-package net.thehunter365.botloader.loader;
+package net.thehunter365.botloaderapi.loader;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.thehunter365.botloaderapi.BotLoaderApi;
 import net.thehunter365.botloaderapi.api.Bot;
 import net.thehunter365.botloaderapi.api.BotManager;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.net.URL;
@@ -16,6 +17,7 @@ import java.util.jar.JarFile;
 public class BotLoader implements BotManager {
 
     private BotLoaderApi botLoaderApi;
+    private Logger logger;
     private Gson gson;
     private File botsFolder;
 
@@ -25,6 +27,8 @@ public class BotLoader implements BotManager {
 
     public BotLoader(BotLoaderApi botLoaderApi) {
         this.botLoaderApi = botLoaderApi;
+        this.logger = botLoaderApi.getLogger();
+
         this.botsFolder = new File("./bots/");
         if (!botsFolder.exists()) {
             botsFolder.mkdir();
@@ -49,14 +53,15 @@ public class BotLoader implements BotManager {
                 try (JarFile jar = new JarFile(file)) {
                     JarEntry info = jar.getJarEntry("bot.json");
 
-                    if (info != null) {
-                        this.botLoaderApi.getLogger().error("Failed to load bot.json file in " + file.getName());
+                    if (info == null) {
+                        logger.warn("Failed to load bot.json in " + file.getName());
                     } else {
                         try (InputStream is = jar.getInputStream(info)) {
                             BotDescription description = load(is, BotDescription.class);
 
                             assert description != null;
                             description.setFile(file);
+                            logger.info("Successfully loaded bot " + description.getName());
                             botsToLoad.put(description.getName(), description);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -74,12 +79,13 @@ public class BotLoader implements BotManager {
             URLClassLoader loader = new BotClassLoader(new URL[] {description.getFile().toURI().toURL()});
 
             Class<?> main = ((BotClassLoader) loader).loadClass(description.getMainClass());
-            net.thehunter365.botloader.loader.Bot botClass = (net.thehunter365.botloader.loader.Bot) main.getDeclaredConstructor().newInstance();
+            Bot botClass = (Bot) main.getDeclaredConstructor().newInstance();
 
             botClass.init(this.botLoaderApi, description);
 
-            botLoaderApi.getLogger().info("Succesfully loaded " + description.getName() + " Bot !");
             botLoaderApi.getExecutor().submit(botClass::onEnable);
+            logger.info("Successfully started bot " + description.getName());
+
             bots.put(description.getName(), botClass);
         } catch (Throwable e) {
             e.printStackTrace();

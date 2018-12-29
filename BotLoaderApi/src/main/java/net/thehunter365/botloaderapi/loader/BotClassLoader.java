@@ -1,4 +1,4 @@
-package net.thehunter365.botloader.loader;
+package net.thehunter365.botloaderapi.loader;
 
 import java.net.URL;
 import java.net.URLClassLoader;

@@ -9,7 +9,7 @@ public abstract class BotLoaderApi {
 
     public abstract ExecutorService getExecutor();
 
-    public abstract Logger getLogger();
-
     public abstract BotManager getBotManager();
+
+    public abstract Logger getLogger();
 }
