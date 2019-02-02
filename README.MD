@@ -29,7 +29,7 @@ Main class
 
 ```java
 
-public class YourBot implements Bot {
+public class YourBot extends Bot {
     
     @Override
     public void onEnable() {
