@@ -81,7 +81,7 @@ public class BotLoader implements BotManager {
             Class<?> main = ((BotClassLoader) loader).loadClass(description.getMainClass());
             Bot botClass = (Bot) main.getDeclaredConstructor().newInstance();
 
-            botClass.init(this.botLoaderApi, description);
+            botClass.init(this.botLoaderApi, description, new File(botsFolder, description.getName()+"/"));
 
             botLoaderApi.getExecutor().submit(botClass::onEnable);
             logger.info("Successfully started bot " + description.getName());
