@@ -15,5 +15,7 @@ public abstract class Command {
 
     public abstract String[] getArgs();
 
+    public abstract void setExecutor(CommandExecutor executor);
+
 
 }
